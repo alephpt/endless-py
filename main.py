@@ -20,8 +20,10 @@ def main():
                 x, y = event.pos
                 # update the pitch and yaw of the camera based on the mouse movement
                 engine.update_camera_direction(x, y)
-                # update the previous mouse position
-                engine.prev_mouse_pos = (x, y)      
+                # reset the mouse location and update the previous mouse position
+                pygame.mouse.set_pos(SCREEN_SIZE[0] / 2, SCREEN_SIZE[1] / 2)
+                engine.prev_mouse_pos = pygame.mouse.get_pos()
+                
 
         engine.camera.set_projection(*SCREEN_SIZE)
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)

@@ -9,6 +9,8 @@ class Engine:
         pygame.display.set_mode(screen_size, DOUBLEBUF|OPENGL)
         pygame.mouse.set_visible(False)
         gluPerspective(45, (screen_size[0]/screen_size[1]), 0.1, 1000.0)
+        self.screen_width = screen_size[0]
+        self.screen_height = screen_size[1]
         self.camera = Camera()
         self.prev_mouse_pos = (0, 0)
         self.acceleration = 0
@@ -33,25 +35,11 @@ class Engine:
         dx = x - self.prev_mouse_pos[0]
         dy = y - self.prev_mouse_pos[1]
         
-        new_yaw = self.yaw + dx / 100
-        new_pitch = self.pitch + dy / 100
-        
-        # make sure yaw and pitch are within the range [-360, 360]
-        if new_yaw > 360:
-            new_yaw -= 360
-        elif new_yaw < -360:
-            new_yaw += 360
-        if new_pitch > 360:
-            new_pitch -= 360
-        elif new_pitch < -360:
-            new_pitch += 360
+        yaw = dx / 5
+        pitch = dy / 10
 
-        # update the camera's pitch and yaw
-        self.yaw = new_yaw
-        self.pitch = new_pitch
-        
         # update the camera rotation based on the mouse movement
-        self.camera.look(self.yaw, self.pitch)
+        self.camera.look(yaw, pitch)
         return
 
     # move the camera based on key presses
@@ -87,4 +75,3 @@ class Engine:
         
         pygame.display.flip()
         self.clock.tick(30)
-        return
