@@ -167,7 +167,7 @@ class Quaternion:
         return [phi, theta, psi]
     
     @classmethod
-    def from_euler(cls, phi, theta, psi) -> 'Quaternion':
+    def from_euler_angles(cls, phi, theta, psi) -> 'Quaternion':
         """
         Creates a quaternion from euler angles.
         
@@ -258,3 +258,12 @@ class Quaternion:
         Quaternion: The unit quaternion.
         """
         return self/self.norm()
+
+    def to_rotation_matrix(self) -> np.array:
+        """
+        Returns the rotation matrix corresponding to the quaternion as a 64-byte np.array
+        
+        Returns:
+        64-byte np.array: The rotation matrix.
+        """
+        return self.to_matrix().astype(np.float64)
