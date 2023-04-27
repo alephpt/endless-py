@@ -4,13 +4,15 @@ from pygame.locals import DOUBLEBUF, OPENGL
 from camera import Camera
 
 class Engine:
-    def __init__(self, screen_size):
+    def __init__(self):
         pygame.init()
-        pygame.display.set_mode(screen_size, DOUBLEBUF|OPENGL)
+        # get the full size of the screen and set the display
+        self.screen_size = (pygame.display.Info().current_w, pygame.display.Info().current_h)
+        pygame.display.set_mode(self.screen_size, DOUBLEBUF|OPENGL)
         pygame.mouse.set_visible(False)
-        gluPerspective(45, (screen_size[0]/screen_size[1]), 0.1, 1000.0)
-        self.screen_width = screen_size[0]
-        self.screen_height = screen_size[1]
+        gluPerspective(45, (self.screen_size[0]/self.screen_size[1]), 0.1, 1000.0)
+        self.screen_width = self.screen_size[0]
+        self.screen_height = self.screen_size[1]
         self.camera = Camera()
         self.prev_mouse_pos = (0, 0)
         self.acceleration = 0
@@ -35,11 +37,11 @@ class Engine:
         dx = x - self.prev_mouse_pos[0]
         dy = y - self.prev_mouse_pos[1]
         
-        yaw = dx / 5
-        pitch = dy / 10
+        yaw = dx / 3
+        pitch = dy / 6
 
         # update the camera rotation based on the mouse movement
-        self.camera.look(yaw, pitch)
+        self.camera.look(-yaw, pitch)
         return
 
     # move the camera based on key presses

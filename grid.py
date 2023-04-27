@@ -1,10 +1,10 @@
 from OpenGL.GL import glBegin, glEnd, glColor3f, glVertex3fv, GL_LINES
 
 square = (
-    (1, -1, 0),
-    (1, 1, 0),
-    (-1, 1, 0),
-    (-1, -1, 0)
+    (1, 0, 0),
+    (1, 0, 0),
+    (-1, 0, 0),
+    (-1, -0, 0)
     )
 
 edges = (
