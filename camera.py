@@ -14,7 +14,7 @@ class Camera:
     def pitch(self, angle):
         radians = math.radians(angle)
         
-        new_forward = self.forward * math.cos(radians) - self.up * math.sin(radians)
+        new_forward = self.forward * math.cos(radians) + self.up * math.sin(radians)
         new_up = self.up * math.cos(radians) - self.forward * math.sin(radians)
         new_right = np.cross(new_forward, new_up)
         
