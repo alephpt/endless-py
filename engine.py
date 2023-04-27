@@ -1,19 +1,32 @@
 import pygame
 from OpenGL.GLU import gluPerspective
+from OpenGL.GL import glEnable, glCullFace, glFrontFace, GL_DEPTH_TEST, GL_CULL_FACE, GL_BACK, GL_CW, GL_CLIP_DISTANCE0
 from pygame.locals import DOUBLEBUF, OPENGL
 from camera import Camera
+from world import World
 
 class Engine:
-    def __init__(self):
+    def __init__(self, map_size):
         pygame.init()
         # get the full size of the screen and set the display
         self.screen_size = (pygame.display.Info().current_w, pygame.display.Info().current_h)
         pygame.display.set_mode(self.screen_size, DOUBLEBUF|OPENGL)
         pygame.mouse.set_visible(False)
         gluPerspective(45, (self.screen_size[0]/self.screen_size[1]), 0.1, 1000.0)
+        
+        # set depth, culling and clipping
+        # glEnable(GL_DEPTH_TEST)
+        # glEnable(GL_CULL_FACE)
+        # glCullFace(GL_BACK)
+        # glFrontFace(GL_CW)
+        # glEnable(GL_CLIP_DISTANCE0)
+
         self.screen_width = self.screen_size[0]
         self.screen_height = self.screen_size[1]
+        self.world = World(map_size)
+        self.world.construct_map()
         self.camera = Camera()
+        self.map_size = map_size
         self.prev_mouse_pos = (0, 0)
         self.acceleration = 0
         self.yaw = 0
@@ -71,9 +84,11 @@ class Engine:
             self.navigate(key)
 
         # update the camera location based on fwd, right, up
-        self.camera.move(self.acceleration)
+        self.camera.move(self.acceleration, self.map_size)
         #self.camera.pos = self.camera.pos - self.camera.forward * self.acceleration
         self.camera.set()
+        
+        self.world.render()
         
         pygame.display.flip()
         self.clock.tick(30)

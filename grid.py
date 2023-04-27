@@ -19,7 +19,7 @@ class Grid:
     def __init__(self):
         self.grid = []
         self.edges = []
-        self.grid_sq = 25
+        self.grid_sq = 10
         self.create_grid()
     
     def create_grid(self):
@@ -43,18 +43,17 @@ class Grid:
         # zip up verticals and horitzontals interlaced
         self.edges = [val for pair in zip(verticals, horizontals) for val in pair]
                 
+    def move_grid(self, offset):
+        for i in range(len(self.grid)):
+            self.grid[i] = (self.grid[i][0] + offset[0], self.grid[i][1] + offset[1], self.grid[i][2] + offset[2])
 
-    def render(self):
+    def draw(self):
         glBegin(GL_LINES)
         for edge in self.edges:
             for vertex in edge:
                 glVertex3fv(self.grid[vertex])
-                if vertex == 0:
-                    glColor3f(1, 0, 0)
-                else:
-                    vert = edge[0]
-                    # color the vertex blue
-                    glColor3f(0.75 - (vert + 1) / (self.grid_sq ** 2) * 0.5, \
-                            0.25 + (vert + 1) / (self.grid_sq ** 2) * 0.25, \
-                            0.25 + (vert + 1) / (self.grid_sq ** 2 * 0.5))
+                vert = edge[0]
+                glColor3f(0.75 - (vert + 1) / (self.grid_sq ** 2) * 0.5, \
+                        0.25 + (vert + 1) / (self.grid_sq ** 2) * 0.25, \
+                        0.25 + (vert + 1) / (self.grid_sq ** 2 * 0.5))
         glEnd()
