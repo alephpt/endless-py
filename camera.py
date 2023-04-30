@@ -11,10 +11,11 @@ class Camera:
         self.up = np.array([0, 1, 0])
         self.right = np.array([1, 0, 0])
 
+    # rotates the camera around the right vector
     def pitch(self, angle):
         radians = math.radians(angle)
         
-        new_forward = self.forward * math.cos(radians) + self.up * math.sin(radians)
+        new_forward = self.forward * math.cos(radians) - self.up * math.sin(radians)
         new_up = self.up * math.cos(radians) - self.forward * math.sin(radians)
         new_right = np.cross(new_forward, new_up)
         
@@ -22,6 +23,7 @@ class Camera:
         self.up = new_up
         self.right = new_right / np.linalg.norm(new_right)
 
+    # rotates the camera around the up vector
     def yaw(self, angle):
         radians = math.radians(angle)
         
@@ -33,42 +35,7 @@ class Camera:
         self.right = new_right / np.linalg.norm(new_right)
         self.up = new_up / np.linalg.norm(new_up)
 
-    def look(self, yaw, pitch):
-        self.yaw(yaw)
-        self.pitch(pitch)
-
-    # moves the camera forward or backward based on 
-    # the camera's current forward vector
-    def move(self, t, map_size=100):
-        offset = map_size // 2
-        new_pos = self.pos + self.forward * t
-        
-        # check if the new position has gone out of bounds
-        # if the x position is less than -offset set to offset
-        if new_pos[0] < -offset:
-            new_pos[0] = offset
-        # or if the x position is greater than offset set to -offset
-        elif new_pos[0] > offset:
-            new_pos[0] = -offset
-        # if the y position is less than -offset set to offset
-        if new_pos[1] < -offset:
-            new_pos[1] = offset
-        # or if the y position is greater than offset set to -offset
-        elif new_pos[1] > offset:
-            new_pos[1] = -offset
-        # if the z position is less than -offset set to offset
-        if new_pos[2] < -offset:
-            new_pos[2] = offset
-        # or if the z position is greater than offset set to -offset
-        elif new_pos[2] > offset:
-            new_pos[2] = -offset
-        
-        self.pos = new_pos
-    
-    # rolls the camera by the given angle in degrees
-    # with respect to the camera's current orientation
-    # positive angles roll the camera clockwise
-    # updating the camera's up and right vectors
+    # rotates the camera around the forward vector
     def roll(self, angle):
         radians = math.radians(angle)
         
@@ -77,6 +44,31 @@ class Camera:
         
         self.up = new_up
         self.right = new_right
+    
+    # move the camera direction based on the cursor movement
+    def look(self, yaw, pitch):
+        self.yaw(yaw)
+        self.pitch(pitch)
+
+    # moves the camera forward or backward based on 
+    # the camera's current forward vector
+    def move(self, t, map_size=100):
+        offset = map_size // 2
+        self.pos = self.pos + self.forward * t
+        
+        # check if the new position has gone out of bounds
+        if self.pos[0] < -offset:
+            self.pos[0] = offset
+        elif self.pos[0] > offset:
+            self.pos[0] = -offset
+        if self.pos[1] < -offset:
+            self.pos[1] = offset
+        elif self.pos[1] > offset:
+            self.pos[1] = -offset
+        if self.pos[2] < -offset:
+            self.pos[2] = offset
+        elif self.pos[2] > offset:
+            self.pos[2] = -offset
     
     def set_projection(self, width, height):
         glMatrixMode(GL_PROJECTION)
