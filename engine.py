@@ -1,6 +1,6 @@
 import pygame
 from OpenGL.GLU import gluPerspective
-from OpenGL.GL import glEnable, glCullFace, glFrontFace, GL_DEPTH_TEST, GL_CULL_FACE, GL_BACK, GL_CW, GL_CLIP_DISTANCE0
+from OpenGL.GL import *
 from pygame.locals import DOUBLEBUF, OPENGL
 from camera import Camera
 from world import World
@@ -20,6 +20,12 @@ class Engine:
         # glCullFace(GL_BACK)
         # glFrontFace(GL_CW)
         # glEnable(GL_CLIP_DISTANCE0)
+        
+        # set the projection matrix
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        gluPerspective(45, self.screen_size[0]/self.screen_size[1], 0.1, 100)
+        glMatrixMode(GL_MODELVIEW)
 
         self.screen_width = self.screen_size[0]
         self.screen_height = self.screen_size[1]
@@ -31,6 +37,7 @@ class Engine:
         self.acceleration = 0
         self.yaw = 0
         self.pitch = 0
+        self.roll = 0
         self.max_acceleration = 3
         self.clock = pygame.time.Clock()
         
@@ -50,12 +57,11 @@ class Engine:
         dx = x - self.prev_mouse_pos[0]
         dy = y - self.prev_mouse_pos[1]
         
-        yaw = dx / 3
-        pitch = dy / 6
-
-        # update the camera rotation based on the mouse movement
-        self.camera.look(-yaw, pitch)
-        return
+        self.yaw = dx / 3
+        self.pitch = dy / 6
+        
+        # TODO: fix the pitch so that it doesn't go past 90 degrees or -90 degrees
+        # TODO: fix the yaw so that it doesn't go past 360 degrees or -360 degrees
 
     # move the camera based on key presses
     def navigate(self, key):
@@ -69,26 +75,33 @@ class Engine:
             self.govern_speed(self.acceleration - 0.01)
             return
 
+        # TODO: fix the roll so that it doesn't go past 360 degrees or -360 degrees
         # update the roll of the camera
         if key[pygame.K_a]:
-            self.camera.roll(5)
+            self.roll += 5
             return
         if key[pygame.K_d]:
-            self.camera.roll(-5)
+            self.roll -= 5
             return
     
     # update the camera location
     def update(self):
+        # move the camera based on key presses
         if key := pygame.key.get_pressed():
-            # move the camera based on key presses
             self.navigate(key)
+
+        # update the pitch, yaw and roll of the camera
+        self.camera.look(self.yaw, self.pitch, self.roll)
 
         # update the camera location based on fwd, right, up
         self.camera.move(self.acceleration, self.map_size)
-        #self.camera.pos = self.camera.pos - self.camera.forward * self.acceleration
+
+        # update the cameras direction in opengl
         self.camera.set()
         
+        # render the world
         self.world.render()
         
+        # update the display and tick the clock
         pygame.display.flip()
         self.clock.tick(30)

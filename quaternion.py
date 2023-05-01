@@ -17,6 +17,37 @@ class Quaternion:
         self.x = axis[0] * np.sin(angle/2)
         self.y = axis[1] * np.sin(angle/2)
         self.z = axis[2] * np.sin(angle/2)
+        
+    def __getitem__(self, b):
+        """
+        Returns the value of the quaternion at the given index.
+        """
+        if isinstance(b, int):
+            if b == 0:
+                return self.x
+            elif b == 1:
+                return self.y
+            elif b == 2:
+                return self.z
+            elif b == 3:
+                return self.w
+            else:
+                raise IndexError("Quaternion index out of range")
+        elif isinstance(b, slice):  
+            if b == slice(None):
+                return [self.x, self.y, self.z, self.w]
+            else:
+                [self.x, self.y, self.z, self.w][b.start:b.stop:b.step]
+        elif isinstance(b, tuple):
+            if len(b) == 2:
+                if isinstance(b[0], int) and isinstance(b[1], int):
+                    return [self[b[0]], self[b[1]]]
+                else:
+                    raise IndexError("Quaternion slice must be [:]")
+            else:
+                raise IndexError("Quaternion slice must be [:]")
+        else:
+            return self.__dict__[b] if b in self.__dict__ else None
     
     def __repr__(self):
         return f"Quaternion({self.x}, {self.y}, {self.z}, {self.w})"
@@ -267,3 +298,39 @@ class Quaternion:
         64-byte np.array: The rotation matrix.
         """
         return self.to_matrix().astype(np.float64)
+    
+    def conjugate(self) -> 'Quaternion':
+        """
+        Returns the conjugate of the quaternion
+        
+        Returns:
+        Quaternion: The conjugate.
+        """
+        return Quaternion([-self.x, -self.y, -self.z], self.w)
+    
+    def inverse(self) -> 'Quaternion':
+        """
+        Returns the inverse of the quaternion
+        
+        Returns:
+        Quaternion: The inverse.
+        """
+        return self.conjugate()/self.norm()**2
+    
+    def to_np_array(self) -> np.array:
+        """
+        Returns the quaternion as a 64-byte np.array
+        
+        Returns:
+        64-byte np.array: The quaternion.
+        """
+        return np.array([self.x, self.y, self.z], dtype=np.float64)
+    
+    def normalized_np_array(self) -> np.array:
+        """
+        Returns the normalized quaternion as a 64-byte np.array
+        
+        Returns:
+        64-byte np.array: The normalized quaternion.
+        """
+        return self.to_np_array()/self.norm()
