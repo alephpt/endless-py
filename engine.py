@@ -13,19 +13,19 @@ class Engine:
         pygame.display.set_mode(self.screen_size, DOUBLEBUF|OPENGL)
         pygame.mouse.set_visible(False)
         gluPerspective(45, (self.screen_size[0]/self.screen_size[1]), 0.1, 1000.0)
-        
+
         # set depth, culling and clipping
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_CULL_FACE)
         glCullFace(GL_BACK)
         glFrontFace(GL_CW)
         glEnable(GL_CLIP_DISTANCE0)
-        
+
         # # set the projection matrix
-        # glMatrixMode(GL_PROJECTION)
-        # glLoadIdentity()
-        # gluPerspective(45, self.screen_size[0]/self.screen_size[1], 0.1, 100)
-        # glMatrixMode(GL_MODELVIEW)
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        gluPerspective(45, self.screen_size[0]/self.screen_size[1], 0.1, 100)
+        glMatrixMode(GL_MODELVIEW)
 
         self.screen_width = self.screen_size[0]
         self.screen_height = self.screen_size[1]
@@ -40,7 +40,7 @@ class Engine:
         self.roll = 0
         self.max_acceleration = 3
         self.clock = pygame.time.Clock()
-        
+
     # govern the speed of the camera
     def govern_speed(self, a):
         if a > self.max_acceleration:
@@ -56,11 +56,20 @@ class Engine:
         # determine the change in mouse position
         dx = x - self.prev_mouse_pos[0]
         dy = y - self.prev_mouse_pos[1]
-        
+
         self.yaw += dx / 3
         self.pitch += dy / 6
 
-        
+        if self.pitch > 90:
+            self.pitch = 90
+        elif self.pitch < -90:
+            self.pitch = -90
+
+        if self.yaw > 360:
+            self.yaw = 0
+        elif self.yaw < -360:
+            self.yaw = 0
+
 
 
     # move the camera based on key presses
@@ -83,14 +92,14 @@ class Engine:
         if key[pygame.K_d]:
             self.roll -= 1
             return
-    
+
     # update the camera location
     def update(self):
         # move the camera based on key presses
         if key := pygame.key.get_pressed():
             self.navigate(key)
 
-        print("\nyaw: ", self.yaw, " pitch: ", self.pitch, " roll: ", self.roll)
+        print("yaw: ", self.yaw, " pitch: ", self.pitch, " roll: ", self.roll)
         # update the pitch, yaw and roll of the camera
         self.camera.look(self.yaw, self.pitch, self.roll)
 
@@ -99,10 +108,10 @@ class Engine:
 
         # update the cameras direction in opengl
         self.camera.set()
-        
+
         # render the world
         self.world.render()
-        
+
         # update the display and tick the clock
         pygame.display.flip()
         self.clock.tick(15)
