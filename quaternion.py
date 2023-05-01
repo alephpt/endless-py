@@ -52,7 +52,7 @@ class Quaternion:
     def __repr__(self):
         return f"Quaternion({self.x}, {self.y}, {self.z}, {self.w})"
     
-    def __mul__(self, other: 'Quaternion') -> 'Quaternion':
+    def __mul__(self, other) -> 'Quaternion':
         """
         Multiplies two quaternions.
 
@@ -62,10 +62,16 @@ class Quaternion:
         Returns:
         Quaternion: The product of the two quaternions.
         """
-        w = self.w*other.w - self.x*other.x - self.y*other.y - self.z*other.z
-        x = self.w*other.x + self.x*other.w + self.y*other.z - self.z*other.y
-        y = self.w*other.y - self.x*other.z + self.y*other.w + self.z*other.x
-        z = self.w*other.z + self.x*other.y - self.y*other.x + self.z*other.w
+        if isinstance(other, float) or isinstance(other, int):
+            x = self.x * other
+            y = self.y * other
+            z = self.z * other
+            w = self.w * other
+        else:
+            w = self.w*other.w - self.x*other.x - self.y*other.y - self.z*other.z
+            x = self.w*other.x + self.x*other.w + self.y*other.z - self.z*other.y
+            y = self.w*other.y - self.x*other.z + self.y*other.w + self.z*other.x
+            z = self.w*other.z + self.x*other.y - self.y*other.x + self.z*other.w
         return Quaternion([x, y, z], w)
     
     def __add__(self, other: 'Quaternion') -> 'Quaternion':

@@ -57,17 +57,11 @@ class Engine:
         dx = x - self.prev_mouse_pos[0]
         dy = y - self.prev_mouse_pos[1]
         
-        self.yaw = dx / 3
-        self.pitch = dy / 6
+        self.yaw += dx / 3
+        self.pitch += dy / 6
+
         
-        # update the pitch where it can flip 180 degrees
-        if self.pitch >= 270:
-            self.pitch = -90
-        elif self.pitch <= -270:
-            self.pitch = 90
-        
-        if -360 >= self.yaw >= 360:
-            self.yaw = 0
+
 
     # move the camera based on key presses
     def navigate(self, key):
@@ -84,10 +78,10 @@ class Engine:
         # TODO: fix the roll so that it doesn't go past 360 degrees or -360 degrees
         # update the roll of the camera
         if key[pygame.K_a]:
-            self.roll += 5
+            self.roll += 1
             return
         if key[pygame.K_d]:
-            self.roll -= 5
+            self.roll -= 1
             return
     
     # update the camera location
@@ -96,6 +90,7 @@ class Engine:
         if key := pygame.key.get_pressed():
             self.navigate(key)
 
+        print("\nyaw: ", self.yaw, " pitch: ", self.pitch, " roll: ", self.roll)
         # update the pitch, yaw and roll of the camera
         self.camera.look(self.yaw, self.pitch, self.roll)
 

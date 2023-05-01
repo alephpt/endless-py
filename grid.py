@@ -27,7 +27,6 @@ class Grid:
             for i in range(self.grid_sq + 1):
                 x = i - self.grid_sq // 2
                 z = j - self.grid_sq // 2
-                print(x, 0, z)
                 self.grid.append((x, 0, z))
 
         verticals = []

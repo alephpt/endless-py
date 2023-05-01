@@ -1,7 +1,7 @@
 import numpy as np
 from OpenGL.GL import glMatrixMode, glLoadIdentity, glRotatef, glTranslatef, GL_PROJECTION, GL_MODELVIEW
 from OpenGL.GLU import gluPerspective, gluLookAt
-from pyquaternion import Quaternion
+from quaternion import Quaternion
 
 
 class Camera:
@@ -10,21 +10,26 @@ class Camera:
         self.rotation_quaternion = Quaternion()
 
     def get_rotation_quaternion(self, pitch, yaw, roll):
-        x_axis = Quaternion(1, 0, 0, pitch)
-        y_axis = Quaternion(0, 1, 0, yaw)
-        z_axis = Quaternion(0, 0, 1, roll)
+        print("Rotation Angles: ", pitch, yaw, roll)
+        x_axis = Quaternion(np.array([1, 0, 0]), pitch)
+        y_axis = Quaternion(np.array([0, 1, 0]), yaw)
+        z_axis = Quaternion(np.array([0, 0, 1]), roll)
+        print("Rotation Quaternion: ", "\n", x_axis, "\n", y_axis, "\n", z_axis)
         return x_axis * y_axis * z_axis
 
     def rotate_vector_by_quaternion(self, vector, quaternion):
-        vector_quaternion = Quaternion(0, *vector)
-        return quaternion * vector_quaternion * quaternion.conjugate
+        vector_quaternion = Quaternion.from_rotation_vector(vector)
+        return quaternion * vector_quaternion# * quaternion.conjugate()
 
     def look(self, yaw, pitch, roll):
+        pitch = np.radians(pitch)
+        yaw = np.radians(yaw)
+        roll = np.radians(roll)
         self.rotation_quaternion = self.get_rotation_quaternion(pitch, yaw, roll)
 
     def move(self, t, map_size=100):
         offset = map_size // 2
-        forward = self.rotate_vector_by_quaternion(np.array([0, 0, 1]), self.rotation_quaternion)
+        forward = self.rotate_vector_by_quaternion(np.array([0, 0, 1]), self.rotation_quaternion).normalized_np_array()
         new_pos = self.pos + forward * t
         new_pos = np.clip(new_pos, -offset, offset)
         self.pos = new_pos
@@ -42,9 +47,6 @@ class Camera:
         
     def set(self):
         glLoadIdentity()
-        forward = self.rotate_vector_by_quaternion(np.array([0, 0, -1]), self.rotation_quaternion)
-        up = self.rotate_vector_by_quaternion(np.array([0, 1, 0]), self.rotation_quaternion)
-        target = self.pos + forward
-        gluLookAt(self.pos[0], self.pos[1], self.pos[2],
-                target[0], target[1], target[2],
-                up[0], up[1], up[2])
+        #glRotatef(self.rotation_quaternion.w, self.rotation_quaternion.x, self.rotation_quaternion.y, self.rotation_quaternion.z)
+        #glTranslatef(self.pos[0], self.pos[1], self.pos[2])
+        gluLookAt(self.pos[0], self.pos[1], self.pos[2], self.pos[0] + self.rotation_quaternion.x, self.pos[1] + self.rotation_quaternion.y, self.pos[2] + self.rotation_quaternion.z, 0, 1, 0)
