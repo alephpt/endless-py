@@ -5,7 +5,7 @@ class Quaternion:
     """
     A class representing a quaternion.
     """
-    def __init__(self, axis: List[float], angle: float) -> None:
+    def __init__(self, axis=[0.0, 0.0, 0.0], angle=0.0) -> None:
         """
         Creates a quaternion from an axis and an angle.
 

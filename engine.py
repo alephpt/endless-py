@@ -15,17 +15,17 @@ class Engine:
         gluPerspective(45, (self.screen_size[0]/self.screen_size[1]), 0.1, 1000.0)
         
         # set depth, culling and clipping
-        # glEnable(GL_DEPTH_TEST)
-        # glEnable(GL_CULL_FACE)
-        # glCullFace(GL_BACK)
-        # glFrontFace(GL_CW)
-        # glEnable(GL_CLIP_DISTANCE0)
+        glEnable(GL_DEPTH_TEST)
+        glEnable(GL_CULL_FACE)
+        glCullFace(GL_BACK)
+        glFrontFace(GL_CW)
+        glEnable(GL_CLIP_DISTANCE0)
         
-        # set the projection matrix
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        gluPerspective(45, self.screen_size[0]/self.screen_size[1], 0.1, 100)
-        glMatrixMode(GL_MODELVIEW)
+        # # set the projection matrix
+        # glMatrixMode(GL_PROJECTION)
+        # glLoadIdentity()
+        # gluPerspective(45, self.screen_size[0]/self.screen_size[1], 0.1, 100)
+        # glMatrixMode(GL_MODELVIEW)
 
         self.screen_width = self.screen_size[0]
         self.screen_height = self.screen_size[1]
@@ -60,8 +60,14 @@ class Engine:
         self.yaw = dx / 3
         self.pitch = dy / 6
         
-        # TODO: fix the pitch so that it doesn't go past 90 degrees or -90 degrees
-        # TODO: fix the yaw so that it doesn't go past 360 degrees or -360 degrees
+        # update the pitch where it can flip 180 degrees
+        if self.pitch >= 270:
+            self.pitch = -90
+        elif self.pitch <= -270:
+            self.pitch = 90
+        
+        if -360 >= self.yaw >= 360:
+            self.yaw = 0
 
     # move the camera based on key presses
     def navigate(self, key):
@@ -104,4 +110,4 @@ class Engine:
         
         # update the display and tick the clock
         pygame.display.flip()
-        self.clock.tick(30)
+        self.clock.tick(15)
